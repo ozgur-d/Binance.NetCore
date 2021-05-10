@@ -201,7 +201,7 @@ namespace Binance.NetCore.Data.Interface
         /// Get BinanceTime
         /// </summary>
         /// <returns>long of timestamp</returns>
-        long GetBinanceTime();
+        Task<ServerTime> GetBinanceTime();
 
         /// <summary>
         /// Withdraw funds from exchange

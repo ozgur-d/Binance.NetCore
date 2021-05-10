@@ -321,13 +321,19 @@ namespace Binance.NetCore.Data
         /// <returns>Array OrderResponse object</returns>
         public async Task<OrderResponse[]> GetOpenOrders(string symbol)
         {
+            
             var queryString = new List<string>
             {
                 $"symbol={symbol}"
             };
-
-            string url = CreateUrl($"/api/v3/openOrders", true, queryString.ToArray());
-
+            string url = "";
+            if (symbol != "") { 
+             url = CreateUrl($"/api/v3/openOrders", true, queryString.ToArray());
+            }
+            else
+            {
+                 url = CreateUrl($"/api/v3/openOrders", true);
+            }
             var response = await _restRepo.GetApiStream<OrderResponse[]>(url, GetRequestHeaders());
 
             return response;
@@ -405,22 +411,23 @@ namespace Binance.NetCore.Data
         /// <returns>TradeResponse object</returns>
         public async Task<TradeResponse> DeleteTrade(CancelTradeParams tradeParams)
         {
-            string url = CreateUrl("/api/v3/order");
+            
 
-            var headers = GetRequestHeaders();
-
-            headers.Add("symbol", tradeParams.symbol);
+            //var headers = GetRequestHeaders();
+            var queryString = new List<string>();
+            queryString.Add($"symbol={tradeParams.symbol}");
             if (tradeParams.orderId != 0)
             {
-                headers.Add("orderId", tradeParams.orderId.ToString());
+                queryString.Add($"orderId={tradeParams.orderId.ToString()}");
             }
             else if (!string.IsNullOrEmpty(tradeParams.origClientOrderId))
             {
-                headers.Add("origClientOrderId", tradeParams.origClientOrderId);
+                queryString.Add($"origClientOrderId={tradeParams.origClientOrderId}");
             }
-            headers.Add("timestamp", _dtHelper.UTCtoUnixTime().ToString());
+            //queryString.Add($"timestamp={_dtHelper.UTCtoUnixTime().ToString()}");
 
-            var response = await _restRepo.DeleteApi<TradeResponse>(url, headers);
+            string url = CreateUrl("/api/v3/order", true, queryString.ToArray(), true);
+            var response = await _restRepo.DeleteApi<TradeResponse>(url, GetRequestHeaders());
 
             return response;
         }
@@ -976,13 +983,13 @@ namespace Binance.NetCore.Data
         /// Get BinanceTime
         /// </summary>
         /// <returns>long of timestamp</returns>
-        public long GetBinanceTime()
+        public async Task<ServerTime> GetBinanceTime()
         {
             string url = CreateUrl("/api/v1/time", false);
 
-            var response = _restRepo.GetApi<ServerTime>(url).Result;
+            var response = await _restRepo.GetApi<ServerTime>(url);
 
-            return response.serverTime;
+            return response;
         }
 
         /// <summary>

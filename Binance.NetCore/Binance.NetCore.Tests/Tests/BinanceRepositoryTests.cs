@@ -122,7 +122,7 @@ namespace Binance.NetCore.Tests
         {
             var binanceTime = _repo.GetBinanceTime();
 
-            Assert.True(binanceTime > 0);
+            Assert.True(binanceTime.Result.serverTime > 0);
         }
 
         [Fact]

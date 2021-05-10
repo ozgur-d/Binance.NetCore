@@ -776,11 +776,15 @@ namespace Binance.NetCore
         /// Get BinanceTime
         /// </summary>
         /// <returns>long of timestamp</returns>
-        public long GetBinanceTime()
+        public ServerTime GetBinanceTime()
         {
-            return _repository.GetBinanceTime();
+            return _repository.GetBinanceTime().Result;
         }
 
+        public async Task<ServerTime> GetBinanceTimeAsync()
+        {
+            return await _repository.GetBinanceTime();
+        }
         /// <summary>
         /// Get exchange and symbol information
         /// </summary>
